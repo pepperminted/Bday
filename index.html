@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>50th Birthday Countdown</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <h1>50th Birthday Countdown</h1>
+  <form>
+    <label for="birthday">Enter your birthday (YYYY-MM-DD):</label>
+    <input type="date" id="birthday" name="birthday">
+    <button id="submit">Submit</button>
+  </form>
+  <div id="result"></div>
+
+  <script>
+    const form = document.querySelector('form');
+    const resultDiv = document.querySelector('#result');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const birthday = document.querySelector('#birthday').value;
+      fetch('/calculate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ birthday }),
+      })
+      .then((response) => response.json())
+      .then((data) => {
+        resultDiv.innerHTML = `You will turn 50 in ${data.days} days!`;
+      })
+      .catch((error) => console.error(error));
+    });
+  </script>
+</body>
+</html>
