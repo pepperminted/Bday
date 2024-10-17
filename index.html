@@ -12,8 +12,8 @@
   <h1>50th Birthday Countdown</h1>
   <form>
     <label for="birthday">Enter your birthday (YYYY-MM-DD):</label>
-    <input type="date" id="birthday" name="birthday">
-    <button id="submit">Submit</button>
+    <input type="date" id="birthday" name="birthday" required>
+    <button type="submit">Submit</button>
   </form>
   <div id="result"></div>
 
@@ -22,25 +22,38 @@
     const resultDiv = document.querySelector('#result');
 
     form.addEventListener('submit', (e) => {
-      console.log('form submitted');
-      e.preventDefault();
-      const birthday = document.querySelector('#birthday').value;
-      console.log(`birthday: ${birthday}`);
-      fetch('/calculate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ birthday }),
-      })
-      .then((response) => {
-        console.log('response:', response);
-        return response.json();
-      })
-      .then((data) => {
-        console.log('data:', data);
-        resultDiv.innerHTML = `You will turn 50 in ${data.days} days!`;
-      })
-      .catch((error) => console.error('error:', error));
-    });
+  e.preventDefault();
+  const birthday = document.querySelector('#birthday').value;
+
+  if (!birthday) {
+    resultDiv.innerHTML = 'Please enter a valid date!';
+    return;
+  }
+
+  fetch('/calculate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ birthday }),
+  })
+  .then((response) => {
+    if (!response.ok) {
+      return response.json().then(err => Promise.reject(err));
+    }
+    return response.json();
+  })
+  .then((data) => {
+    if (data.error) {
+      resultDiv.innerHTML = data.error;
+    } else {
+      resultDiv.innerHTML = `You will turn 50 in ${data.days} days!`;
+    }
+  })
+  .catch((error) => {
+    console.error('error:', error);
+    resultDiv.innerHTML = 'An error occurred. Please try again.';
+  });
+});
+
   </script>
 </body>
 </html>
